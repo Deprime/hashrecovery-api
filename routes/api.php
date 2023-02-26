@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Auth\{
 use App\Http\Controllers\Api\{
   ProfileController,
   TaskController,
+  RigController,
 };
 
 /*
@@ -37,6 +38,12 @@ Route::namespace('Api')->group(function() {
       Route::post('restore-password', [AccessRestoreController::class, 'restorePasswordByPhone']);
     });
 
+    Route::prefix('rig')->group(function () {
+      Route::get('/connection',         [RigController::class, 'connection']);
+      Route::get('/access',             [RigController::class, 'access']);
+      Route::get('/agents',             [RigController::class, 'listAgents']);
+      Route::get('/agents/{agent_id}',  [RigController::class, 'get'])->whereNumber('agent_id');
+    });
 
     // Application
     Route::prefix('app')->group(function() {
