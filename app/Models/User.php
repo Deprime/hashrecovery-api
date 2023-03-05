@@ -6,6 +6,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Carbon\Carbon;
 
+use Illuminate\Database\Eloquent\Relations\{
+  HasMany,
+  HasOne,
+  BelongsTo,
+  BelongsToMany,
+};
+
 class User extends Authenticatable
 {
   use HasApiTokens;
@@ -51,4 +58,12 @@ class User extends Authenticatable
   protected $casts = [
     'reg_date' => 'datetime',
   ];
+
+  /**
+   * Tasks
+   */
+  public function tasks(): HasMany
+  {
+    return $this->hasMany(Task::class, 'userid', 'user_id');
+  }
 }

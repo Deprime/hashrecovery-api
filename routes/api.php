@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\{
   ProfileController,
   TaskController,
   RigController,
+  DictionaryController,
 };
 
 /*
@@ -36,6 +37,11 @@ Route::namespace('Api')->group(function() {
       Route::post('signin-telegram',  [SigninController::class, 'signinTelegram']);
       Route::delete('logout',         [SigninController::class, 'logout']);
       Route::post('restore-password', [AccessRestoreController::class, 'restorePasswordByPhone']);
+    });
+
+    Route::prefix('dictionary')->group(function () {
+      Route::get('/positions',         [DictionaryController::class, 'positionList']);
+      Route::get('/categories',        [DictionaryController::class, 'categoryList']);
     });
 
     Route::prefix('rig')->group(function () {

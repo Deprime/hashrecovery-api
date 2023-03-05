@@ -8,46 +8,32 @@ use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 use App\Models\{
-  PostStatus,
+  Position,
   Category,
 };
 
-use App\ValueObjects\{
-  PhonePrefix,
-};
 
 class DictionaryController extends Controller
 {
   /**
-   * Phone prefix list
+   * Position list
    * @param  \Illuminate\Http\Request  $request
    * @return \Illuminate\Http\JsonResponse
    */
-  public function phonePrefixList(Request $request)
+  public function positionList(Request $request)
   {
-    $phone_prefixes = PhonePrefix::list();
-    return response()->json($phone_prefixes, Response::HTTP_OK);
+    $positions = Position::with(['category'])->get();
+    return response()->json($positions, Response::HTTP_OK);
   }
 
   /**
-   * Post status list
+   * Category list
    * @param  \Illuminate\Http\Request  $request
    * @return \Illuminate\Http\JsonResponse
    */
-  public function eventStatusList(Request $request): JsonResponse
+  public function categoryList(Request $request)
   {
-    $post_status_list = PostStatus::query()->get();
-    return response()->json($post_status_list, Response::HTTP_OK);
-  }
-
-  /**
-   * Category  list
-   * @param  \Illuminate\Http\Request  $request
-   * @return \Illuminate\Http\JsonResponse
-   */
-  public function categoryList(Request $request): JsonResponse
-  {
-    $category_list = Category::query()->orderBy('order')->get();
-    return response()->json($category_list, Response::HTTP_OK);
+    $categories = Category::with(['positions'])->orderByDesc('sortby')->get();
+    return response()->json($categories, Response::HTTP_OK);
   }
 }

@@ -4,7 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\{
+  HasMany,
+  HasOne,
   BelongsTo,
+  BelongsToMany,
 };
 
 class Category extends Model
@@ -23,4 +26,13 @@ class Category extends Model
     'category_name',
     'sortby',
   ];
+
+
+  /**
+   * Positions
+   */
+  public function positions(): HasMany
+  {
+    return $this->hasMany(Position::class, 'category_id', 'category_id');
+  }
 }

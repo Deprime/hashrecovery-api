@@ -4,7 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\{
+  HasMany,
+  HasOne,
   BelongsTo,
+  BelongsToMany,
 };
 
 class Position extends Model
@@ -28,4 +31,12 @@ class Position extends Model
     'position_date',
     'category_id',
   ];
+
+  /**
+   * Category
+   */
+  public function category(): BelongsTo
+  {
+    return $this->belongsTo(Category::class, 'category_id', 'category_id');
+  }
 }
