@@ -72,7 +72,7 @@ class AccessRestoreController extends Controller
         ]);
       }
       catch (\Exception $exception) {
-        return response()->json(['error' => $exception->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY );
+        return response()->json(['error' => $exception->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
       }
     }
     return response()->json([], Response::HTTP_NOT_FOUND);

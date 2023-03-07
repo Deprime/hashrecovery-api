@@ -35,4 +35,16 @@ return [
       'token' => env('TELEGRAM_BOT_TOKEN'),
     ],
 
+    'currency' => [
+      'usd2rub' => env('USD_TO_RUB'),
+    ],
+
+    'qiwi' => [
+      'secret-key' => env('QIWI_SECRET_KEY'),
+    ],
+
+    'crystalpay' => [
+      'secret-key' => env('CRYSTAL_PAY_KEY'),
+      'login'      => env('CRYSTAL_PAY_LOGIN')
+    ],
 ];

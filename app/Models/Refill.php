@@ -36,10 +36,10 @@ class Refill extends Model
    * @var array<string, string>
    */
   protected $casts = [
-    'amount' => 'integer',
+    'amount'  => 'integer',
     'receipt' => 'integer',
-    'dates' => 'datetime',
-    'dates_unix' => 'datetime',
+    // 'dates' => 'datetime',
+    // 'dates_unix' => 'datetime',
   ];
 
   /**

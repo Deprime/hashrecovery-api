@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\{
   TaskController,
   RigController,
   DictionaryController,
+  PaymentController,
 };
 
 /*
@@ -66,8 +67,19 @@ Route::namespace('Api')->group(function() {
           Route::get('/sessions',          [ProfileController::class, 'getSessions']);
           Route::post('/telegram-connect', [ProfileController::class, 'telegramConnect']);
         });
+
+        // Payments
+        Route::prefix('payments')->group(function() {
+          Route::get('/',               [PaymentController::class, 'list']);
+          Route::get('/{payment_id}',   [PaymentController::class, 'get'])->whereNumber('payment_id');
+          Route::post('/fiat',          [PaymentController::class, 'createFiat']);
+          Route::post('/crypto',        [PaymentController::class, 'createCrypto']);
+        });
       });
     });
+
+    // Route::get('/createPayment',    [PaymentController::class, 'create']);
+    // Route::get('/createCrypto',     [PaymentController::class, 'createCrypto']);
   });
 });
 

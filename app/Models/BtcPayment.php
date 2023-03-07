@@ -35,5 +35,6 @@ class BtcPayment extends Model
     'date'   => 'datetime',
     'finish' => 'boolean',
     'cost'   => 'integer',
+    'userid' => 'integer',
   ];
 }
