@@ -49,7 +49,7 @@ Route::namespace('Api')->group(function() {
       Route::get('/connection',         [RigController::class, 'connection']);
       Route::get('/access',             [RigController::class, 'access']);
       Route::get('/agents',             [RigController::class, 'listAgents']);
-      Route::get('/agents/{agent_id}',  [RigController::class, 'get'])->whereNumber('agent_id');
+      // Route::get('/agents/{agent_id}',  [RigController::class, 'get'])->whereNumber('agent_id');
     });
 
     // Application
@@ -68,6 +68,11 @@ Route::namespace('Api')->group(function() {
           Route::post('/telegram-connect', [ProfileController::class, 'telegramConnect']);
         });
 
+        // Tasks
+        Route::prefix('tasks')->group(function() {
+          Route::post('/', [TaskController::class, 'create']);
+        });
+
         // Payments
         Route::prefix('payments')->group(function() {
           Route::get('/',               [PaymentController::class, 'list']);
@@ -78,8 +83,9 @@ Route::namespace('Api')->group(function() {
       });
     });
 
-    // Route::get('/createPayment',    [PaymentController::class, 'create']);
-    // Route::get('/createCrypto',     [PaymentController::class, 'createCrypto']);
+    Route::post('/task/create',    [TaskController::class, 'create']);
+    // Route::get('/createPayment',  [PaymentController::class, 'create']);
+    // Route::get('/createCrypto',   [PaymentController::class, 'createCrypto']);
   });
 });
 

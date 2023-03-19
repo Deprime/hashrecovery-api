@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\{
+  HasMany,
+  HasOne,
   BelongsTo,
+  BelongsToMany,
 };
 
-class Category extends Model
+class Purchase extends Model
 {
   protected $table = 'storage_purchases';
   protected $primaryKey = 'increment';

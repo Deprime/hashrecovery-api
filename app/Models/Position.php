@@ -33,6 +33,15 @@ class Position extends Model
   ];
 
   /**
+   * The attributes that should be hidden for serialization.
+   *
+   * @var array<int, string>
+   */
+  // protected $hidden = [
+  //   'supertask_id',
+  // ];
+
+  /**
    * Category
    */
   public function category(): BelongsTo

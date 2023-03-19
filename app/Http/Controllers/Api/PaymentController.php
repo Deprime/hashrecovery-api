@@ -29,13 +29,10 @@ class PaymentController extends Controller
    */
   public function list(Request $request)
   {
-    $user    = $request->user();
-    $fiat = Refill::where('user_id', $user->user_id)->get();
-    $crypto  = BtcPayment::where('userid', $user->increment)->get();
-    return response()->json([
-      'fiat' => $fiat,
-      'crypto' => $crypto,
-    ], Response::HTTP_OK);
+    $user   = $request->user();
+    $fiat   = Refill::where('user_id', $user->user_id)->get();
+    $crypto = BtcPayment::where('userid', $user->increment)->get();
+    return response()->json(['fiat' => $fiat, 'crypto' => $crypto], Response::HTTP_OK);
   }
 
   /**

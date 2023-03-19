@@ -42,7 +42,7 @@ class SignupController extends Controller
       $user = AuthService::createUserByLogin($input['login'], $input['password']);
     }
     catch (\Exception $exception) {
-      return response()->json(['error' => $exception->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY );
+      return response()->json(['error' => $exception->getMessage()], Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     $token = AuthService::createToken($request, $user);

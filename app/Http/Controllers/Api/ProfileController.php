@@ -22,7 +22,6 @@ use App\Services\{
 use App\Models\{
   User,
   Role,
-  RealtorAccess,
 };
 
 class ProfileController extends Controller

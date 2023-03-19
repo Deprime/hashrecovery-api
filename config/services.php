@@ -35,6 +35,11 @@ return [
       'token' => env('TELEGRAM_BOT_TOKEN'),
     ],
 
+    'rig' => [
+      'token' => env('RIG_TOKEN'),
+      'url'   => env('RIG_URL'),
+    ],
+
     'currency' => [
       'usd2rub' => env('USD_TO_RUB'),
     ],
