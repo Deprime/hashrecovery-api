@@ -9,9 +9,7 @@ use Illuminate\Database\Eloquent\Relations\{
 
 class Setting extends Model
 {
-  protected $table = 'storage_settings';
-  protected $primaryKey = null;
-  public $incrementing = false;
+  protected $table = 'settings';
   public $timestamps = false;
 
   /**
@@ -20,12 +18,27 @@ class Setting extends Model
    * @var array<int, string>
    */
   protected $fillable = [
-    'contact',
-    'faq',
-    'status',
-    'status_buy',
-    'profit_buy',
-    'profit_refill',
-    'taskpriority',
+    'value',
+    'comment',
   ];
+
+  /**
+   * Scope Prioroty
+   * @param  \Illuminate\Database\Eloquent\Builder  $query
+   * @return \Illuminate\Database\Eloquent\Builder
+   */
+  public function scopePriority($query)
+  {
+    return $query->where('key', 'taskpriority');
+  }
+
+  /**
+   * Scope cracker_id
+   * @param  \Illuminate\Database\Eloquent\Builder  $query
+   * @return \Illuminate\Database\Eloquent\Builder
+   */
+  public function scopeCrackerId($query)
+  {
+    return $query->where('key', 'cracker_id');
+  }
 }

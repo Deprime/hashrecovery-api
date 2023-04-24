@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\{
   BelongsToMany,
 };
 
+use App\Models\User;
+
 class Purchase extends Model
 {
   protected $table = 'storage_purchases';
@@ -22,6 +24,7 @@ class Purchase extends Model
    * @var array<int, string>
    */
   protected $fillable = [
+    'real_user_id',
     'user_id',
     'user_login',
     'user_name',
@@ -57,6 +60,34 @@ class Purchase extends Model
    */
   public function User(): BelongsTo
   {
-    return $this->belongsTo(User::class, 'user_id', 'user_id');
+    return $this->belongsTo(User::class, 'real_user_id', 'increment');
+  }
+
+  /**
+   * Create payload
+   */
+  public static function createPayload(User $user, int $price, int $hashlistId): array {
+    $balance_before = $user->balance;
+    $balance_after  = $user->balance - $price;
+    $purchase_date  = strtotime(date("Y-m-d H:i:s"));
+
+    $payload = [
+      'real_user_id' => $user->increment,
+      'user_id'      => $user->user_id,
+      'user_login'   => $user->user_login,
+      'user_name'    => $user->user_name,
+      'receipt'      => $hashlistId,
+      'item_count'   => 1,
+      'item_price'   => $price,
+      // 'item_price_one_item' => $price,
+      // 'item_position_id' => $position->position_id,
+      // 'item_position_name' => $position->position_name,
+      // 'item_buy' => $position->position_name,
+      'balance_before' => $balance_before,
+      'balance_after'  => $balance_after,
+      'buy_date'       => $purchase_date,
+      'buy_date_unix'  => $purchase_date,
+    ];
+    return $payload;
   }
 }

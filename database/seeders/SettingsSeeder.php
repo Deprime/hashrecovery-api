@@ -37,6 +37,7 @@ class SettingsSeeder extends Seeder
       ['key' => 'profit_buy',     'type' => 'boolean', 'value' => true],
       ['key' => 'profit_refill',  'type' => 'boolean', 'value' => true],
       ['key' => 'taskpriority',   'type' => 'integer', 'value' => 989998717],
+      ['key' => 'cracker_id',   'type' => 'integer', 'value' => 8],
     ];
     \DB::table($table)->truncate();
     \DB::table($table)->insert($data);

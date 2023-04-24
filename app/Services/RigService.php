@@ -5,7 +5,22 @@ namespace App\Services;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 
+use App\Models\{
+  Setting,
+};
+
 class RigService {
+  protected const METHODS_ERRORS = [
+    'base'           => ['reason' => 'Error: base error'],
+    'connection'     => ['reason' => 'Error: connection'],
+    'access'         => ['reason' => 'Error: access'],
+    'listAgent'      => ['reason' => 'Error: list agent'],
+    'getAgent'       => ['reason' => 'Error: get agent'],
+    'createHashlist' => ['reason' => 'Error: create hashlist'],
+    'runSupertask'   => ['reason' => 'Error: run supertask'],
+    'listTasks'      => ['reason' => 'Error: list tasks'],
+    'setSupertaskPriority' => ['reason' => 'Error: set supertask priority'],
+  ];
 
   /**
    * Request
@@ -99,7 +114,7 @@ class RigService {
       "isSalted"      => false,
       "isSecret"      => true,
       "useBrain"      => false,
-      "name"          => date('Y-m-d H:i:s'),
+      "name"          => strtotime(date("Y-m-d H:i:s")) . " app",
     ];
     $response = self::request($data);
     return $response;
@@ -113,12 +128,14 @@ class RigService {
    */
   public static function runSupertask(int $hashlistId, int $supertaskId)
   {
+    $cracker = Setting::crackerId()->first();
+    $crackerVersionId = $cracker ? $cracker->value : 8;
     $data = [
       "section"     => "task",
       "request"     => "runSupertask",
       "hashlistId"  => $hashlistId,
       "supertaskId" => $supertaskId,
-      "crackerVersionId" => 2,
+      "crackerVersionId" => $crackerVersionId,
     ];
     $response = self::request($data);
     return $response;
@@ -138,7 +155,6 @@ class RigService {
     return $response;
   }
 
-
   /**
    * Set supertask priority
    * @param int $supertaskId
@@ -155,5 +171,30 @@ class RigService {
     ];
     $response = self::request($data);
     return $response;
+  }
+
+  /**
+   * Error handler
+   * @param string $method
+   * @param object $response
+   * @return object
+   */
+  public static function errorHandler(string $method, $response): array {
+    $reason = (isset(static::METHODS_ERRORS[$method]))
+      ? static::METHODS_ERRORS[$method]
+      : static::METHODS_ERRORS['base'];
+
+    return [
+      'reason'   => $reason,
+      'response' => $response,
+    ];
+  }
+
+  /**
+   * Error JSON response
+   */
+  public static function errorJsonResponse(string $method, $response) {
+    $err_response = self::errorHandler($method, $response);
+    return response()->json($err_response, Response::HTTP_SERVICE_UNAVAILABLE);
   }
 }

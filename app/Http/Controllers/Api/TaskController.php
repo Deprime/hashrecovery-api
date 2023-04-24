@@ -36,12 +36,22 @@ class TaskController extends Controller
   public function list(Request $request): JsonResponse
   {
     $per_page  = 25;
-    $task_list = Task::query()
-      // ->with(['user'])
-      ->orderByDesc('id')
+    $only_owner = $request->get('only_owner');
+
+    $task_list = Task::query();
+
+    if ($only_owner === 'true') {
+      $user = $request->user();
+      if ($user) {
+        $task_list = $task_list->where('real_user_id', $user->increment);
+      }
+    }
+    $task_list = $task_list->orderByDesc('id')
       ->paginate($per_page);
 
-    return response()->json($task_list);
+    return response()->json([
+      'tasks' => $task_list,
+    ]);
   }
 
   /**
@@ -55,8 +65,11 @@ class TaskController extends Controller
     // $user  = $request->user();
     $user  = User::find(1095);
 
+    $position_id = $input['position_id'];
+    $hash        = $input['hash'];
+
     // Position check
-    $position = Position::with('category')->where('position_id', $input['position_id'])->first();
+    $position = Position::with('category')->where('position_id', $position_id)->first();
     if (!$position) {
       return response()->json(['position' => 'Position not found'], Response::HTTP_NOT_FOUND);
     }
@@ -67,42 +80,66 @@ class TaskController extends Controller
       return response()->json(['balance' => 'Not enough funds'], Response::HTTP_PAYMENT_REQUIRED);
     }
 
+    // Step 1 - prepare
     $hash_type_id = $position->category->hash_type_id;
-    $encoded_hash = base64_encode($input['hash']);
-    // return response()->json([$encoded_hash, $hash_type_id]);
+    $encoded_hash = base64_encode($hash);
 
     # Step 2 - now we got hashListId
+    $response = RigService::createHashlist($hash_type_id, $encoded_hash);
+    if ($response->response !== "OK") {
+      return RigService::errorJsonResponse("createHashlist", $response);
+    }
 
-    $response    = RigService::createHashlist($hash_type_id, $encoded_hash);
-    $hashlistId  = $response->hashlistId;
+    $hashlist_id = $response->hashlistId;
     $supertaskId = $position->supertask_id;
 
-    $response2 = RigService::runSupertask($hashlistId, $supertaskId);
+    # Run supertask
+    $response2 = RigService::runSupertask($hashlist_id, $supertaskId);
+    if ($response2->response !== "OK") {
+      return RigService::errorJsonResponse("runSupertask", $response2);
+    }
 
-    $task_list = RigService::listTasks();
-    return response()->json([
-      $response2,
-    ]);
+    # Get task list
+    $response3 = RigService::listTasks();
+    if ($response3->response !== "OK") {
+      return RigService::errorJsonResponse("listTasks", $response3);
+    }
 
-    // RigService::setSupertaskPriority($hash_type_id, $encoded_hash);
+    // Searching task
+    $task = collect($response3->tasks)->first(function ($item) use ($hashlist_id) {
+      return isset($item->hashlistId) ? $item->hashlistId === $hashlist_id : false;
+    });
 
-    // # Decrease task priority from settings
-    // $setting = Setting::first();
-    // $setting->update([
-    //   "taskpriority" => $setting->taskpriority - 1,
-    // ]);
+    if ($task) {
+      $settingPriority = Setting::priority()->first();
+      $newPriority     = $settingPriority->value - 1;
 
-    // Task::create()
+      # Set supertask priority
+      $response4 = RigService::setSupertaskPriority($task->supertaskId, $newPriority);
+      if ($response4->response !== "OK") {
+        return RigService::errorJsonResponse("setSupertaskPriority", $response4);
+      }
 
-    # Withdraw payment if price > 0
-    // if ($price > 0) {
-    //   $user->update([
-    //     'balance' =>  $user->balance - $price,
-    //   ]);
+      # Decrease task priority from settings
+      $settingPriority->update(["value" => $newPriority]);
 
-    //   Purchase::create();
-    // }
+      # Create purchase
+      $payload_purchase = Purchase::createPayload($user, $price, $hashlist_id);
+      Purchase::create($payload_purchase);
 
-    return response()->json([$input, $response]);
+      # Create task
+      $task_id      = $task->supertaskId;
+      $payload_task = Task::createPayload($user, $position, $hashlist_id, $task_id, $newPriority, $hash);
+      $new_task     = Task::create($payload_task);
+
+      # Withdraw payment
+      $new_balance  = $user->balance - $price;
+      $user->update(['balance' => $new_balance]);
+
+      return response()->json(['task' => $new_task]);
+    }
+    else {
+      return response()->json(['reason' => 'Task was not found'], Response::HTTP_SERVICE_UNAVAILABLE);
+    }
   }
 }

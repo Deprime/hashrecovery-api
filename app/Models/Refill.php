@@ -19,6 +19,7 @@ class Refill extends Model
    * @var array<int, string>
    */
   protected $fillable = [
+    'real_user_id',
     'user_id',
     'user_login',
     'user_name',
@@ -28,6 +29,18 @@ class Refill extends Model
     'way_pay',
     'dates',
     'dates_unix',
+  ];
+
+  /**
+   * The attributes that should be hidden for serialization.
+   *
+   * @var array<int, string>
+   */
+  protected $hidden = [
+    'user_login',
+    'user_name',
+    'way_pay',
+    'comment',
   ];
 
   /**

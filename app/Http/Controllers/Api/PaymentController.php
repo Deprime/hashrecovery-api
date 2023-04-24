@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Carbon\Carbon;
 
 use App\Models\{
   Position,
@@ -29,10 +30,28 @@ class PaymentController extends Controller
    */
   public function list(Request $request)
   {
+    // Lifetime of crypto payments
+    $lifetime = 6; // hours
+    $delta  = Carbon::now()->subHours(6);
+
     $user   = $request->user();
     $fiat   = Refill::where('user_id', $user->user_id)->get();
+    // $fiat   = $fiat->filter(function ($record) use ($delta) {
+    //   $date = new Carbon($record->date);
+    //   return $record->finish || $date->greaterThan($delta);
+    // })->flatten();
+
+    // Crypto
     $crypto = BtcPayment::where('userid', $user->increment)->get();
-    return response()->json(['fiat' => $fiat, 'crypto' => $crypto], Response::HTTP_OK);
+    $crypto = $crypto->filter(function ($record) use ($delta) {
+      $date = new Carbon($record->dates);
+      return $record->finish || $date->greaterThan($delta);
+    })->flatten();
+
+    return response()->json([
+      'fiat'   => $fiat,
+      'crypto' => $crypto,
+    ], Response::HTTP_OK);
   }
 
   /**
@@ -58,7 +77,7 @@ class PaymentController extends Controller
     $amount = $input['amount'] * config('services.currency.usd2rub');
 
     $billPayments = new \Qiwi\Api\BillPayments(config('services.qiwi.secret-key'));
-    $billId = rand(100000000000, 999999999999);
+    $billId   = rand(100000000000, 999999999999);
     $lifetime = $billPayments->getLifetimeByDay(0.0208);
     // $increment = 187123519;
     // dd($billPayments);
@@ -75,8 +94,6 @@ class PaymentController extends Controller
 
     /** @var \Qiwi\Api\BillPayments $billPayments */
     $response = $billPayments->createBill($billId, $fields);
-    // dd($response);
-
     return response()->json($response, Response::HTTP_OK);
   }
 
@@ -114,11 +131,12 @@ class PaymentController extends Controller
 
     if (!$result->error) {
       $payment = BtcPayment::create([
-        'userid'    => $user->increment,
+        'real_user_id' => $user->increment,
+        'userid'    => $user->user_id,
         'crystalid' => $result->id,
         'date'      => strtotime(date("Y-m-d H:i:s")),
         'finish'    => false,
-        'cost'      => $amount,
+        'cost'      => $input['amount'],
       ]);
 
       $response = [

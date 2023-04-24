@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Relations\{
   BelongsTo,
 };
 
+use App\Models\User;
+use App\Models\Position;
+
 class Task extends Model
 {
   protected $table = 'tasks';
@@ -19,6 +22,7 @@ class Task extends Model
    * @var array<int, string>
    */
   protected $fillable = [
+    'real_user_id',
     'userid',
     'username',
     'hashid',
@@ -52,7 +56,7 @@ class Task extends Model
     'found' => 'boolean',
     'counthash' => 'integer',
     'copov' => 'boolean',
-    'date' => 'datetime',
+    // 'date' => 'datetime',
     'datefinish' => 'datetime',
   ];
 
@@ -62,5 +66,40 @@ class Task extends Model
   public function User(): BelongsTo
   {
     return $this->belongsTo(User::class, 'userid', 'user_id');
+  }
+
+
+  /**
+   * Create payload
+   */
+  public static function createPayload(
+    User $user,
+    Position $position,
+    int $hashlist_id,
+    int $task_id,
+    int $priority,
+    string $hash,
+  ): array {
+    $payload = [
+      'real_user_id' => $user->increment,
+      'userid'       => $user->user_id,
+      'username'     => $user->user_name,
+      'hashid'       => $hashlist_id,
+      'taskid'       => $task_id,
+      'percent'      => 0,
+      'finished'     => "False",
+      'priority'     => $priority,
+      'date'         => strtotime(date("Y-m-d H:i:s")),
+      'found'        => 0,
+      'speed'        => 0,
+      'counthash'    => 1, # TODO: add hash counter
+      'copov'        => 0,
+      'description'  => $hash,
+      'slovar'       => $position->position_name,
+      'descriptionhide' => $position->category->category_name,
+      'datefinish'      => null,
+      'paid'            => $position->position_price > 0 ? 1 : 0,
+    ];
+    return $payload;
   }
 }

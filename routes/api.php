@@ -66,6 +66,8 @@ Route::namespace('Api')->group(function() {
           Route::put('/change-password',   [ProfileController::class, 'changePassword']);
           Route::get('/sessions',          [ProfileController::class, 'getSessions']);
           Route::post('/telegram-connect', [ProfileController::class, 'telegramConnect']);
+
+          Route::get('/task',              [TaskController::class, 'list']);
         });
 
         // Tasks
