@@ -61,6 +61,18 @@ class Task extends Model
   ];
 
   /**
+   * Get priority attribute
+   *
+   * @param  i  $value
+   * @return string
+   */
+  public function getPriorityAttribute($value)
+  {
+    $synth = $value - 990000000;
+    return $synth < 0 ? 0 : $synth;
+  }
+
+  /**
    * User
    */
   public function User(): BelongsTo
