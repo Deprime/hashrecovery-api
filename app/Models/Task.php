@@ -63,13 +63,24 @@ class Task extends Model
   /**
    * Get priority attribute
    *
-   * @param  i  $value
+   * @param  string  $value
    * @return string
    */
   public function getPriorityAttribute($value)
   {
     $synth = $value - 990000000;
     return $synth < 0 ? 0 : $synth;
+  }
+
+  /**
+   * Get description attribute
+   *
+   * @param  string  $value
+   * @return string
+   */
+  public function getDescriptionAttribute($value)
+  {
+    return $this->descriptionhide === "WPA" ? base64_decode($value) : "";
   }
 
   /**

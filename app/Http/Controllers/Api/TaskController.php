@@ -46,12 +46,11 @@ class TaskController extends Controller
         $task_list = $task_list->where('real_user_id', $user->increment);
       }
     }
-    $task_list = $task_list->orderByDesc('id')
+    // $task_list = $task_list->orderByDesc('id')
+    $task_list = $task_list->orderByDesc('priority')
       ->paginate($per_page);
 
-    return response()->json([
-      'tasks' => $task_list,
-    ]);
+    return response()->json($task_list);
   }
 
   /**
