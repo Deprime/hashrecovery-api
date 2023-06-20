@@ -46,6 +46,11 @@ class SignupController extends Controller
     }
 
     $token = AuthService::createToken($request, $user);
-    return response()->json(['token' => $token]);
+    $user  = ProfileService::get($user);
+
+    return response()->json([
+      'token' => $token,
+      'user' => $user,
+    ]);
   }
 }

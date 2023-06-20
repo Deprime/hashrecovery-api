@@ -70,6 +70,8 @@ class SigninController extends Controller
       return response()->json(['error' => 'The provided credentials are incorrect'], Response::HTTP_UNAUTHORIZED);
     }
 
+
+
     $token = AuthService::createToken($request, $user);
     $user  = ProfileService::updateTelegramData($request, $user);
     // Get profile with relations

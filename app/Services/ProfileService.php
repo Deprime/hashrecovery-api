@@ -83,12 +83,26 @@ class ProfileService {
   public static function updateTelegramData(SigninTelegramRequest $request, User $user): User
   {
     $input   = $request->validated();
-    $tg_data = [
+    $data = [
       'user_login' => $input['username'],
       'user_name'  => $input['first_name'],
       'avatar'     => $input['avatar'],
     ];
-    $user->update($tg_data);
+
+    if (!$user->login) {
+      // Create dummy login
+      $data['login'] = 'user' . $input['telegram_id'];
+      if ($input['username'] && strlen($input['username']) > 0) {
+        // Login must be unique, so need to check it
+        $sameLoginUser = User::where('login', $input['username'])->first();
+        if (!$sameLoginUser) {
+          // Now we can set login same as TG username
+          $data['login'] = $input['username'];
+        }
+      }
+    }
+
+    $user->update($data);
     return $user;
   }
 

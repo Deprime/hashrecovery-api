@@ -71,7 +71,7 @@ Route::namespace('Api')->group(function() {
         });
 
         // Tasks
-        Route::prefix('tasks')->group(function() {
+        Route::prefix('task')->group(function() {
           Route::post('/', [TaskController::class, 'create']);
         });
 
@@ -85,7 +85,7 @@ Route::namespace('Api')->group(function() {
       });
     });
 
-    Route::post('/task/create',    [TaskController::class, 'create']);
+    // Route::post('/task/create',    [TaskController::class, 'create']);
     // Route::get('/createPayment',  [PaymentController::class, 'create']);
     // Route::get('/createCrypto',   [PaymentController::class, 'createCrypto']);
   });

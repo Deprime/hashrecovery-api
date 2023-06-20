@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 use Illuminate\Database\Eloquent\Relations\{
   HasMany,
@@ -58,6 +59,28 @@ class User extends Authenticatable
   protected $casts = [
     'reg_date' => 'datetime',
   ];
+
+  /**
+   * The attributes that should be appended for serialization.
+   *
+   * @var array<string>
+   */
+  protected $appends = [
+    'has_password'
+  ];
+
+
+  /**
+   * Get has password attribute
+   *
+   * @return \Illuminate\Database\Eloquent\Casts\Attribute
+   */
+  protected function hasPassword(): Attribute
+  {
+    return Attribute::make(
+      get: fn ($value, $attributes) => $attributes['password'] ? true : false
+    );
+  }
 
   /**
    * Tasks
