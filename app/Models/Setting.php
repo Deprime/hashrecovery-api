@@ -41,4 +41,14 @@ class Setting extends Model
   {
     return $query->where('key', 'cracker_id');
   }
+
+  /**
+   * Scope usd2rub
+   * @param  \Illuminate\Database\Eloquent\Builder  $query
+   * @return \Illuminate\Database\Eloquent\Builder
+   */
+  public function scopeUsd2Rub($query)
+  {
+    return $query->where('key', 'usd2rub');
+  }
 }

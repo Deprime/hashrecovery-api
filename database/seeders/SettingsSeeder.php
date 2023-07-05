@@ -4,6 +4,10 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
+use App\Services\{
+  CurrencyService,
+};
+
 class SettingsSeeder extends Seeder
 {
   /**
@@ -13,6 +17,7 @@ class SettingsSeeder extends Seeder
    */
   public function run()
   {
+    $usd2rub = CurrencyService::getUsd2Rub();
     $table = 'settings';
     $contact = "ℹ Контакты. Измените их в настройках бота.
     ➖➖➖➖➖➖➖➖➖➖➖➖➖
@@ -37,7 +42,9 @@ class SettingsSeeder extends Seeder
       ['key' => 'profit_buy',     'type' => 'boolean', 'value' => true],
       ['key' => 'profit_refill',  'type' => 'boolean', 'value' => true],
       ['key' => 'taskpriority',   'type' => 'integer', 'value' => 989998717],
-      ['key' => 'cracker_id',   'type' => 'integer', 'value' => 8],
+      ['key' => 'cracker_id',     'type' => 'integer', 'value' => 8],
+      // ['key' => 'rig_token',      'type' => 'string', 'value' => "xxx"],
+      ['key' => 'usd2rub',        'type' => 'integer', 'value' => $usd2rub],
     ];
     \DB::table($table)->truncate();
     \DB::table($table)->insert($data);

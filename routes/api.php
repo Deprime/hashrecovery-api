@@ -41,8 +41,9 @@ Route::namespace('Api')->group(function() {
     });
 
     Route::prefix('dictionary')->group(function () {
-      Route::get('/positions',         [DictionaryController::class, 'positionList']);
-      Route::get('/categories',        [DictionaryController::class, 'categoryList']);
+      Route::get('/positions',    [DictionaryController::class, 'positionList']);
+      Route::get('/categories',   [DictionaryController::class, 'categoryList']);
+      Route::get('/currency',     [DictionaryController::class, 'currencyList']);
     });
 
     Route::prefix('rig')->group(function () {

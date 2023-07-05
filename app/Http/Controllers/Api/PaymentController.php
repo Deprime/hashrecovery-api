@@ -10,10 +10,10 @@ use Carbon\Carbon;
 
 use App\Models\{
   Position,
-  // Category,
   User,
   Refill,
   BtcPayment,
+  Setting,
 };
 
 use \App\Http\Requests\Payment\{
@@ -35,14 +35,14 @@ class PaymentController extends Controller
     $delta  = Carbon::now()->subHours(6);
 
     $user   = $request->user();
-    $fiat   = Refill::where('user_id', $user->user_id)->get();
+    $fiat   = Refill::where('real_user_id', $user->user_id)->get();
     // $fiat   = $fiat->filter(function ($record) use ($delta) {
     //   $date = new Carbon($record->date);
     //   return $record->finish || $date->greaterThan($delta);
     // })->flatten();
 
     // Crypto
-    $crypto = BtcPayment::where('userid', $user->increment)->get();
+    $crypto = BtcPayment::where('real_user_id', $user->increment)->get();
     $crypto = $crypto->filter(function ($record) use ($delta) {
       $date = new Carbon($record->dates);
       return $record->finish || $date->greaterThan($delta);
@@ -106,7 +106,9 @@ class PaymentController extends Controller
   {
     $input = $request->validated();
     $user  = $request->user();
-    $amount = $input['amount'] * config('services.currency.usd2rub');
+    // $amount = $input['amount'] * config('services.currency.usd2rub');
+    $usd2rub = Setting::usd2Rub()->first();
+    $amount = $input['amount'] * $usd2rub->value;
 
     $payload = [
       "auth_login"  => config('services.crystalpay.login'),
@@ -117,7 +119,6 @@ class PaymentController extends Controller
     ];
 
     $ch = curl_init();
-
     curl_setopt($ch, CURLOPT_URL, "https://api.crystalpay.io/v2/invoice/create/");
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -143,11 +144,10 @@ class PaymentController extends Controller
         "id"  => $result->id,
         "url" => $result->url,
       ];
-
       return response()->json($response, Response::HTTP_OK);
     }
     else {
-      return response()->json(['error' => "Payment gateway errro"], Response::HTTP_UNPROCESSABLE_ENTITY);
+      return response()->json(['error' => "Payment gateway error"], Response::HTTP_UNPROCESSABLE_ENTITY);
     }
   }
 }

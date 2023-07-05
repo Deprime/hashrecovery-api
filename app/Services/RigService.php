@@ -25,7 +25,7 @@ class RigService {
   /**
    * Request
    */
-  public static  function request($payload, $decode = true, $needToken = true) {
+  public static function request($payload, $decode = true, $needToken = true) {
     $url = config('services.rig.url');
     $payload["accessKey"] = config('services.rig.token');
 

@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
+use App\Services\{
+  CurrencyService,
+};
+
 use App\Models\{
   Position,
   Category,
@@ -35,5 +39,17 @@ class DictionaryController extends Controller
   {
     $categories = Category::with(['positions'])->orderByDesc('sortby')->get();
     return response()->json($categories, Response::HTTP_OK);
+  }
+
+
+  /**
+   * Currency list
+   * @param  \Illuminate\Http\Request  $request
+   * @return \Illuminate\Http\JsonResponse
+   */
+  public function currencyList(Request $request)
+  {
+    $data = CurrencyService::getUsd2Rub();
+    return response()->json($data, Response::HTTP_OK);
   }
 }
